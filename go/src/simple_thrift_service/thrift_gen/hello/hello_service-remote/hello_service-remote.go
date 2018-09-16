@@ -21,6 +21,7 @@ func Usage() {
 	flag.PrintDefaults()
 	fmt.Fprintln(os.Stderr, "\nFunctions:")
 	fmt.Fprintln(os.Stderr, "  HelloResponse sendMessage(HelloRequest request)")
+	fmt.Fprintln(os.Stderr, "  HelloResponse getRelevance(HelloRequest request)")
 	fmt.Fprintln(os.Stderr)
 	os.Exit(0)
 }
@@ -120,24 +121,49 @@ func main() {
 			fmt.Fprintln(os.Stderr, "SendMessage requires 1 args")
 			flag.Usage()
 		}
-		arg4 := flag.Arg(1)
-		mbTrans5 := thrift.NewTMemoryBufferLen(len(arg4))
-		defer mbTrans5.Close()
-		_, err6 := mbTrans5.WriteString(arg4)
-		if err6 != nil {
+		arg8 := flag.Arg(1)
+		mbTrans9 := thrift.NewTMemoryBufferLen(len(arg8))
+		defer mbTrans9.Close()
+		_, err10 := mbTrans9.WriteString(arg8)
+		if err10 != nil {
 			Usage()
 			return
 		}
-		factory7 := thrift.NewTSimpleJSONProtocolFactory()
-		jsProt8 := factory7.GetProtocol(mbTrans5)
+		factory11 := thrift.NewTSimpleJSONProtocolFactory()
+		jsProt12 := factory11.GetProtocol(mbTrans9)
 		argvalue0 := hello.NewHelloRequest()
-		err9 := argvalue0.Read(jsProt8)
-		if err9 != nil {
+		err13 := argvalue0.Read(jsProt12)
+		if err13 != nil {
 			Usage()
 			return
 		}
 		value0 := argvalue0
 		fmt.Print(client.SendMessage(value0))
+		fmt.Print("\n")
+		break
+	case "getRelevance":
+		if flag.NArg()-1 != 1 {
+			fmt.Fprintln(os.Stderr, "GetRelevance requires 1 args")
+			flag.Usage()
+		}
+		arg14 := flag.Arg(1)
+		mbTrans15 := thrift.NewTMemoryBufferLen(len(arg14))
+		defer mbTrans15.Close()
+		_, err16 := mbTrans15.WriteString(arg14)
+		if err16 != nil {
+			Usage()
+			return
+		}
+		factory17 := thrift.NewTSimpleJSONProtocolFactory()
+		jsProt18 := factory17.GetProtocol(mbTrans15)
+		argvalue0 := hello.NewHelloRequest()
+		err19 := argvalue0.Read(jsProt18)
+		if err19 != nil {
+			Usage()
+			return
+		}
+		value0 := argvalue0
+		fmt.Print(client.GetRelevance(value0))
 		fmt.Print("\n")
 		break
 	case "":
