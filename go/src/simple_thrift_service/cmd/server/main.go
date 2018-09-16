@@ -25,6 +25,26 @@ func (*HelloServiceHandler) SendMessage(request *hello.HelloRequest) (*hello.Hel
 	return resp, nil
 }
 
+func (*HelloServiceHandler) GetRelevance(request *hello.HelloRequest) (*hello.HelloResponse, error) {
+	resp := hello.NewHelloResponse()
+	resp.Message = request.Message
+	score1, score2 := 0.8, 0.7
+	resp.Results = []*hello.HelloDoc{
+		&hello.HelloDoc{
+			DocID: 101,
+			Vec:   []float64{0.5, 0.5, 0.5},
+			Score: &score1,
+		},
+		&hello.HelloDoc{
+			DocID: 102,
+			Vec:   []float64{0.5, 0.4, 0.6},
+			Score: &score2,
+		},
+	}
+	log.Printf("%s\n", *request.Message)
+	return resp, nil
+}
+
 func NewHelloServiceHandler() hello.HelloService {
 	return new(HelloServiceHandler)
 }

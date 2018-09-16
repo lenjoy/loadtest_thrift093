@@ -33,9 +33,23 @@ func Send(protocolFactory thrift.TProtocolFactory, transport thrift.TTransport, 
 	}
 
 	client := hello.NewHelloServiceClientFactory(transport, protocolFactory)
+
+	// SendMessage
 	request := hello.NewHelloRequest()
 	request.Message = &inputMessage
 	response, err := client.SendMessage(request)
+	if err != nil {
+		log.Printf("%s - %v\n", inputMessage, err)
+		return err
+	}
+	log.Println(*response.Message)
+
+	// GetRelevance
+	var dim int16 = 4
+	var inputID int32 = 1001
+	request.Dimension = &dim
+	request.InputID = &inputID
+	response, err = client.GetRelevance(request)
 	if err != nil {
 		log.Printf("%s - %v\n", inputMessage, err)
 		return err
