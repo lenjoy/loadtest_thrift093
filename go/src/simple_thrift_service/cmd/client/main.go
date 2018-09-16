@@ -15,7 +15,24 @@ import (
 	"simple_thrift_service/thrift_gen/hello"
 )
 
-func Send(client *hello.HelloServiceClient, inputMessage string) error {
+func Connect(transportFactory thrift.TTransportFactory, addr string) (thrift.TTransport, error) {
+	log.Printf("Talking to server at [%s]\n", addr)
+	socket, err := thrift.NewTSocket(addr)
+	if err != nil {
+		return nil, err
+	}
+
+	transport := transportFactory.GetTransport(socket)
+	return transport, nil
+}
+
+func Send(protocolFactory thrift.TProtocolFactory, transport thrift.TTransport, inputMessage string) error {
+	defer transport.Close()
+	if err := transport.Open(); err != nil {
+		return err
+	}
+
+	client := hello.NewHelloServiceClientFactory(transport, protocolFactory)
 	request := hello.NewHelloRequest()
 	request.Message = &inputMessage
 	response, err := client.SendMessage(request)
@@ -25,28 +42,6 @@ func Send(client *hello.HelloServiceClient, inputMessage string) error {
 	}
 	log.Println(*response.Message)
 	return nil
-}
-
-func RunClient(transportFactory thrift.TTransportFactory, protocolFactory thrift.TProtocolFactory, addr string, inputMessage string) (*hello.HelloServiceClient, error) {
-	socket, err := thrift.NewTSocket(addr)
-	if err != nil {
-		return nil, err
-	}
-
-	transport := transportFactory.GetTransport(socket)
-	defer transport.Close()
-	if err := transport.Open(); err != nil {
-		return nil, err
-	}
-
-	client := hello.NewHelloServiceClientFactory(transport, protocolFactory)
-	err = Send(client, inputMessage)
-	if err != nil {
-		Check(err)
-	}
-
-	// TODO: figure out why returned `client` always suffers "Connection not open".
-	return client, nil
 }
 
 func Check(err error) {
@@ -65,13 +60,13 @@ func main() {
 	query := flag.String("query", "hello, world!", "The input message")
 	flag.Parse()
 
-	transportFactory := thrift.NewTFramedTransportFactory(thrift.NewTTransportFactory())
-	protocolFactory := thrift.NewTBinaryProtocolFactoryDefault()
 	addr := *serverAddr
-	log.Printf("Talking to server at [%s]\n", addr)
-
 	inputMessage := *query
-	_, err := RunClient(transportFactory, protocolFactory, addr, inputMessage)
+
+	transportFactory := thrift.NewTFramedTransportFactory(thrift.NewTTransportFactory())
+	transport, err := Connect(transportFactory, addr)
+	protocolFactory := thrift.NewTBinaryProtocolFactoryDefault()
+	err = Send(protocolFactory, transport, inputMessage)
 	if err != nil {
 		log.Println("can not get client")
 		Check(err)
