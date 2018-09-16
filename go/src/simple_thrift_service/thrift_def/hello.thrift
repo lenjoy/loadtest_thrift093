@@ -1,8 +1,8 @@
 /*
 Thrift for simple hello service.
 
-thrift --out src/$PKG/hellothrift --gen go:package_prefix=$PKG/hellothrift src/$PKG/hellothrift/hello.thrift
- */
+loadtest_thrift093/go/src $ thrift --out . --gen go simple_thrift_service/thrift_def/hello.thrift
+*/
 
 namespace go simple_thrift_service.thrift_gen.hello
 
