@@ -17,43 +17,15 @@ import (
 	"simple_thrift_service/service"
 )
 
-const DIMENSION = 4
-
-type HelloServiceHandler struct {
-	docStore *service.DocStore
-}
-
-func (*HelloServiceHandler) SendMessage(request *hello.HelloRequest) (*hello.HelloResponse, error) {
-	resp := hello.NewHelloResponse()
-	resp.Message = request.Message
-	log.Printf("%s\n", *request.Message)
-	return resp, nil
-}
-
-func (this *HelloServiceHandler) GetRelevance(request *hello.HelloRequest) (*hello.HelloResponse, error) {
-	resp := hello.NewHelloResponse()
-	resp.Message = request.Message
-	resp.Results = this.docStore.GetRelatedDocs(*request.InputID, 5)
-	log.Printf("%s\n", *request.Message)
-	return resp, nil
-}
-
-func NewHelloServiceHandler() *HelloServiceHandler {
-	return &HelloServiceHandler{
-		docStore: service.NewDocStore(DIMENSION),
-	}
-}
-
 func RunServer(transportFactory thrift.TTransportFactory, protocolFactory thrift.TProtocolFactory, addr string) error {
 	transport, err := thrift.NewTServerSocket(addr)
 	if err != nil {
 		return err
 	}
 
-	handler := NewHelloServiceHandler()
+	handler := service.NewHelloServiceHandler()
 	processor := hello.NewHelloServiceProcessor(handler)
 	server := thrift.NewTSimpleServer4(processor, transport, transportFactory, protocolFactory)
-
 	return server.Serve()
 }
 
