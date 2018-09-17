@@ -54,7 +54,7 @@ func Send(protocolFactory thrift.TProtocolFactory, transport thrift.TTransport, 
 		log.Printf("%s - %v\n", inputMessage, err)
 		return err
 	}
-	log.Println(*response.Message)
+	log.Println(response)
 	return nil
 }
 
