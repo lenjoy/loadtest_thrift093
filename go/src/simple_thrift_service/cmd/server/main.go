@@ -13,9 +13,14 @@ import (
 	"git.apache.org/thrift.git/lib/go/thrift"
 
 	"simple_thrift_service/thrift_gen/hello"
+
+	"simple_thrift_service/service"
 )
 
+const DIMENSION = 4
+
 type HelloServiceHandler struct {
+	docStore *service.DocStore
 }
 
 func (*HelloServiceHandler) SendMessage(request *hello.HelloRequest) (*hello.HelloResponse, error) {
@@ -25,8 +30,18 @@ func (*HelloServiceHandler) SendMessage(request *hello.HelloRequest) (*hello.Hel
 	return resp, nil
 }
 
-func NewHelloServiceHandler() hello.HelloService {
-	return new(HelloServiceHandler)
+func (this *HelloServiceHandler) GetRelevance(request *hello.HelloRequest) (*hello.HelloResponse, error) {
+	resp := hello.NewHelloResponse()
+	resp.Message = request.Message
+	resp.Results = this.docStore.GetRelatedDocs(*request.InputID, 5)
+	log.Printf("%s\n", *request.Message)
+	return resp, nil
+}
+
+func NewHelloServiceHandler() *HelloServiceHandler {
+	return &HelloServiceHandler{
+		docStore: service.NewDocStore(DIMENSION),
+	}
 }
 
 func RunServer(transportFactory thrift.TTransportFactory, protocolFactory thrift.TProtocolFactory, addr string) error {

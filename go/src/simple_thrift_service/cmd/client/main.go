@@ -33,6 +33,8 @@ func Send(protocolFactory thrift.TProtocolFactory, transport thrift.TTransport, 
 	}
 
 	client := hello.NewHelloServiceClientFactory(transport, protocolFactory)
+
+	// SendMessage
 	request := hello.NewHelloRequest()
 	request.Message = &inputMessage
 	response, err := client.SendMessage(request)
@@ -41,6 +43,21 @@ func Send(protocolFactory thrift.TProtocolFactory, transport thrift.TTransport, 
 		return err
 	}
 	log.Println(*response.Message)
+
+	// GetRelevance
+	var dim int16 = 4
+	var inputID int32 = 1001
+	request.Dimension = &dim
+	request.InputID = &inputID
+	response, err = client.GetRelevance(request)
+	if err != nil {
+		log.Printf("%s - %v\n", inputMessage, err)
+		return err
+	}
+	log.Println(fmt.Sprintf("Message: [%s]", *response.Message))
+	for _, result := range response.Results {
+		log.Println(fmt.Sprintf("doc_id=%d\tscore=%f, %v", result.DocID, *result.Score, result.Vec))
+	}
 	return nil
 }
 
