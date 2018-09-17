@@ -19,11 +19,11 @@ var GoUnusedProtection__ int
 // Attributes:
 //  - Message
 //  - InputID
-//  - Dimension
+//  - TopK
 type HelloRequest struct {
-	Message   *string `thrift:"message,1" json:"message,omitempty"`
-	InputID   *int32  `thrift:"input_id,2" json:"input_id,omitempty"`
-	Dimension *int16  `thrift:"dimension,3" json:"dimension,omitempty"`
+	Message *string `thrift:"message,1" json:"message,omitempty"`
+	InputID *int32  `thrift:"input_id,2" json:"input_id,omitempty"`
+	TopK    *int16  `thrift:"top_k,3" json:"top_k,omitempty"`
 }
 
 func NewHelloRequest() *HelloRequest {
@@ -48,13 +48,13 @@ func (p *HelloRequest) GetInputID() int32 {
 	return *p.InputID
 }
 
-var HelloRequest_Dimension_DEFAULT int16
+var HelloRequest_TopK_DEFAULT int16
 
-func (p *HelloRequest) GetDimension() int16 {
-	if !p.IsSetDimension() {
-		return HelloRequest_Dimension_DEFAULT
+func (p *HelloRequest) GetTopK() int16 {
+	if !p.IsSetTopK() {
+		return HelloRequest_TopK_DEFAULT
 	}
-	return *p.Dimension
+	return *p.TopK
 }
 func (p *HelloRequest) IsSetMessage() bool {
 	return p.Message != nil
@@ -64,8 +64,8 @@ func (p *HelloRequest) IsSetInputID() bool {
 	return p.InputID != nil
 }
 
-func (p *HelloRequest) IsSetDimension() bool {
-	return p.Dimension != nil
+func (p *HelloRequest) IsSetTopK() bool {
+	return p.TopK != nil
 }
 
 func (p *HelloRequest) Read(iprot thrift.TProtocol) error {
@@ -131,7 +131,7 @@ func (p *HelloRequest) readField3(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI16(); err != nil {
 		return thrift.PrependError("error reading field 3: ", err)
 	} else {
-		p.Dimension = &v
+		p.TopK = &v
 	}
 	return nil
 }
@@ -189,15 +189,15 @@ func (p *HelloRequest) writeField2(oprot thrift.TProtocol) (err error) {
 }
 
 func (p *HelloRequest) writeField3(oprot thrift.TProtocol) (err error) {
-	if p.IsSetDimension() {
-		if err := oprot.WriteFieldBegin("dimension", thrift.I16, 3); err != nil {
-			return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:dimension: ", p), err)
+	if p.IsSetTopK() {
+		if err := oprot.WriteFieldBegin("top_k", thrift.I16, 3); err != nil {
+			return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:top_k: ", p), err)
 		}
-		if err := oprot.WriteI16(int16(*p.Dimension)); err != nil {
-			return thrift.PrependError(fmt.Sprintf("%T.dimension (3) field write error: ", p), err)
+		if err := oprot.WriteI16(int16(*p.TopK)); err != nil {
+			return thrift.PrependError(fmt.Sprintf("%T.top_k (3) field write error: ", p), err)
 		}
 		if err := oprot.WriteFieldEnd(); err != nil {
-			return thrift.PrependError(fmt.Sprintf("%T write field end error 3:dimension: ", p), err)
+			return thrift.PrependError(fmt.Sprintf("%T write field end error 3:top_k: ", p), err)
 		}
 	}
 	return err

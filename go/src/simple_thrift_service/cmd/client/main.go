@@ -2,6 +2,7 @@ package main
 
 /*
 loadtest_thrift093/go$ GOPATH=`pwd` go build -v -o ./bin/client simple_thrift_service/cmd/client
+loadtest_thrift093/go$ ./bin/client --server_addr=localhost:9394 --top_k=10
 */
 
 import (
@@ -26,7 +27,7 @@ func Connect(transportFactory thrift.TTransportFactory, addr string) (thrift.TTr
 	return transport, nil
 }
 
-func Send(protocolFactory thrift.TProtocolFactory, transport thrift.TTransport, inputMessage string) error {
+func Send(protocolFactory thrift.TProtocolFactory, transport thrift.TTransport, inputMessage string, topK int16) error {
 	defer transport.Close()
 	if err := transport.Open(); err != nil {
 		return err
@@ -45,9 +46,8 @@ func Send(protocolFactory thrift.TProtocolFactory, transport thrift.TTransport, 
 	log.Println(*response.Message)
 
 	// GetRelevance
-	var dim int16 = 4
 	var inputID int32 = 1001
-	request.Dimension = &dim
+	request.TopK = &topK
 	request.InputID = &inputID
 	response, err = client.GetRelevance(request)
 	if err != nil {
@@ -75,6 +75,7 @@ func main() {
 	flag.Usage = Usage
 	serverAddr := flag.String("server_addr", "localhost:9394", "The server address to talk to")
 	query := flag.String("query", "hello, world!", "The input message")
+	topK := flag.Int64("top_k", 4, "The num of results returning from server")
 	flag.Parse()
 
 	addr := *serverAddr
@@ -83,7 +84,7 @@ func main() {
 	transportFactory := thrift.NewTFramedTransportFactory(thrift.NewTTransportFactory())
 	transport, err := Connect(transportFactory, addr)
 	protocolFactory := thrift.NewTBinaryProtocolFactoryDefault()
-	err = Send(protocolFactory, transport, inputMessage)
+	err = Send(protocolFactory, transport, inputMessage, int16(*topK))
 	if err != nil {
 		log.Println("can not get client")
 		Check(err)

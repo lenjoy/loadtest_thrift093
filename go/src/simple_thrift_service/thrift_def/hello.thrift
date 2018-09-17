@@ -9,7 +9,7 @@ namespace go simple_thrift_service.thrift_gen.hello
 struct HelloRequest {
     1: optional string message;
     2: optional i32 input_id;
-    3: optional i16 dimension;
+    3: optional i16 top_k;
 }
 
 struct HelloResponse {

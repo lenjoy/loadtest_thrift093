@@ -2,6 +2,7 @@ package main
 
 /*
 loadtest_thrift093/go$ GOPATH=`pwd` go build -v -o ./bin/server simple_thrift_service/cmd/server
+loadtest_thrift093/go$ ./bin/server --port 9394
 */
 
 import (
