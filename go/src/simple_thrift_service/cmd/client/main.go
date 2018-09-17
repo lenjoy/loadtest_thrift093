@@ -54,7 +54,10 @@ func Send(protocolFactory thrift.TProtocolFactory, transport thrift.TTransport, 
 		log.Printf("%s - %v\n", inputMessage, err)
 		return err
 	}
-	log.Println(response)
+	log.Println(fmt.Sprintf("Message: [%s]", *response.Message))
+	for _, result := range response.Results {
+		log.Println(fmt.Sprintf("doc_id=%d\tscore=%f, %v", result.DocID, *result.Score, result.Vec))
+	}
 	return nil
 }
 

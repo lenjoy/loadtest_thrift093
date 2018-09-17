@@ -9,16 +9,14 @@ import (
 	"simple_thrift_service/service/randgen"
 )
 
-const DIMENSION = 4
-
 type DocStore struct {
 	// The dimension of the doc vector.
 	Dim int16
 }
 
-func NewDocStore() *DocStore {
+func NewDocStore(dim int16) *DocStore {
 	return &DocStore{
-		Dim: DIMENSION,
+		Dim: dim,
 	}
 }
 

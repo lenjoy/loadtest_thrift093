@@ -13,9 +13,14 @@ import (
 	"git.apache.org/thrift.git/lib/go/thrift"
 
 	"simple_thrift_service/thrift_gen/hello"
+
+	"simple_thrift_service/service"
 )
 
+const DIMENSION = 4
+
 type HelloServiceHandler struct {
+	docStore *service.DocStore
 }
 
 func (*HelloServiceHandler) SendMessage(request *hello.HelloRequest) (*hello.HelloResponse, error) {
@@ -25,28 +30,18 @@ func (*HelloServiceHandler) SendMessage(request *hello.HelloRequest) (*hello.Hel
 	return resp, nil
 }
 
-func (*HelloServiceHandler) GetRelevance(request *hello.HelloRequest) (*hello.HelloResponse, error) {
+func (this *HelloServiceHandler) GetRelevance(request *hello.HelloRequest) (*hello.HelloResponse, error) {
 	resp := hello.NewHelloResponse()
 	resp.Message = request.Message
-	score1, score2 := 0.8, 0.7
-	resp.Results = []*hello.HelloDoc{
-		&hello.HelloDoc{
-			DocID: 101,
-			Vec:   []float64{0.5, 0.5, 0.5},
-			Score: &score1,
-		},
-		&hello.HelloDoc{
-			DocID: 102,
-			Vec:   []float64{0.5, 0.4, 0.6},
-			Score: &score2,
-		},
-	}
+	resp.Results = this.docStore.GetRelatedDocs(*request.InputID, 5)
 	log.Printf("%s\n", *request.Message)
 	return resp, nil
 }
 
-func NewHelloServiceHandler() hello.HelloService {
-	return new(HelloServiceHandler)
+func NewHelloServiceHandler() *HelloServiceHandler {
+	return &HelloServiceHandler{
+		docStore: service.NewDocStore(DIMENSION),
+	}
 }
 
 func RunServer(transportFactory thrift.TTransportFactory, protocolFactory thrift.TProtocolFactory, addr string) error {
