@@ -1,7 +1,10 @@
 package service
 
 import (
+	"log"
 	"sort"
+	"sync"
+	"time"
 
 	"simple_thrift_service/thrift_gen/hello"
 
@@ -22,6 +25,8 @@ func NewDocStore(dim int16) *DocStore {
 
 // GetVector gets vector by given docID.
 func (this *DocStore) GetVector(docID int32) *doc.DocVec {
+	log.Printf("Begin GetVector doc_id[%d]", docID)
+	time.Sleep(time.Millisecond * 50)
 	return randgen.GenVec(int(this.Dim))
 }
 
@@ -29,15 +34,31 @@ func (this *DocStore) GetVector(docID int32) *doc.DocVec {
 func (this *DocStore) GetRelatedDocs(docID int32, n int) []*hello.HelloDoc {
 	seedDocVec := this.GetVector(docID)
 
-	arr := []*hello.HelloDoc{}
 	relatedDocIDs := randgen.GenArray(n + n) // get more candidates
-	for _, relDocID := range relatedDocIDs {
-		docVec := this.GetVector(relDocID)
-		score := doc.DotProd(seedDocVec, docVec)
-		doc := hello.NewHelloDoc()
-		doc.DocID = relDocID
-		doc.Vec = docVec.Vec
-		doc.Score = &score
+	totalNum := len(relatedDocIDs)
+
+	var wg sync.WaitGroup
+	wg.Add(totalNum)
+	docArrCh := make(chan *hello.HelloDoc, 100)
+	for i := 0; i < totalNum; i++ {
+		relDocID := relatedDocIDs[i]
+		go func() {
+			docVec := this.GetVector(relDocID)
+			score := doc.DotProd(seedDocVec, docVec)
+			doc := hello.NewHelloDoc()
+			doc.DocID = relDocID
+			doc.Vec = docVec.Vec
+			doc.Score = &score
+			docArrCh <- doc
+			wg.Done()
+			log.Printf("%d - doc_id[%d] done!", totalNum, relDocID)
+		}()
+	}
+	wg.Wait()
+	close(docArrCh)
+
+	arr := []*hello.HelloDoc{}
+	for doc := range docArrCh {
 		arr = append(arr, doc)
 	}
 

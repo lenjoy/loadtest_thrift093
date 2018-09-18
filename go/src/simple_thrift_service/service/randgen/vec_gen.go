@@ -31,3 +31,7 @@ func GenVec(n int) *doc.DocVec {
 		Vec: ret,
 	}
 }
+
+func GetInt(n int) int {
+	return r.Intn(n)
+}

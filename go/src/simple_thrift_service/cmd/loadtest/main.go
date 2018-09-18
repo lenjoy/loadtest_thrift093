@@ -1,8 +1,8 @@
 package main
 
 /*
-loadtest_thrift093/go [b1 *+=]$ GOPATH=`pwd` go build -v -o ./bin/loadtest simple_thrift_service/cmd/loadtest
-loadtest_thrift093/go [b1 *+=]$ ./bin/loadtest --num_request=20
+loadtest_thrift093/go$ GOPATH=`pwd` go build -v -o ./bin/loadtest simple_thrift_service/cmd/loadtest
+loadtest_thrift093/go$ ./bin/loadtest --num_request=20
 */
 
 import (
@@ -18,6 +18,9 @@ import (
 	bthrift "github.com/lenjoy/bender/thrift"
 
 	"simple_thrift_service/thrift_gen/hello"
+
+	"simple_thrift_service/service"
+	"simple_thrift_service/service/randgen"
 )
 
 func SyntheticRequests(query string, topK int16, n int) chan interface{} {
@@ -26,8 +29,11 @@ func SyntheticRequests(query string, topK int16, n int) chan interface{} {
 		for i := 0; i < n; i++ {
 			request := hello.NewHelloRequest()
 			inputMsg := fmt.Sprintf("%s %d", query, i)
+			inputID := int32(i)
+			reqTopK := int16(int(topK) + randgen.GetInt(5))
 			request.Message = &inputMsg
-			request.TopK = &topK
+			request.InputID = &inputID
+			request.TopK = &reqTopK
 			c <- request
 		}
 		close(c)
@@ -38,8 +44,10 @@ func SyntheticRequests(query string, topK int16, n int) chan interface{} {
 func HelloExecutor(request interface{}, transport thrift.TTransport) (interface{}, error) {
 	pFac := thrift.NewTBinaryProtocolFactoryDefault()
 	client := hello.NewHelloServiceClientFactory(transport, pFac)
-	return client.SendMessage(request.(*hello.HelloRequest))
-	// return client.GetRelevance(request.(*hello.HelloRequest))
+	// return client.SendMessage(request.(*hello.HelloRequest))
+	response, err := client.GetRelevance(request.(*hello.HelloRequest))
+	service.PrintResp(response)
+	return response, err
 }
 
 func Usage() {
@@ -51,14 +59,15 @@ func Usage() {
 func main() {
 	flag.Usage = Usage
 	serverAddr := flag.String("server_addr", "localhost:9394", "The server address to talk to")
-	query := flag.String("query", "hello, world!", "The input message")
+	query := flag.String("query", "hello, loadtest", "The input message")
 	numRequest := flag.Int64("num_request", 10, "The num of requests sending to server")
-	topK := flag.Int64("top_k", 4, "The num of results returning from server")
+	topK := flag.Int64("top_k", 3, "The num of results returning from server")
 	flag.Parse()
 
 	intervals := bender.ExponentialIntervalGenerator(10.0)
 	requests := SyntheticRequests(*query, int16(*topK), int(*numRequest))
-	exec := bthrift.NewThriftRequestExec(thrift.NewTFramedTransportFactory(thrift.NewTTransportFactory()), HelloExecutor, 10*time.Second, *serverAddr)
+	timeout := 20 * time.Second
+	exec := bthrift.NewThriftRequestExec(thrift.NewTFramedTransportFactory(thrift.NewTTransportFactory()), HelloExecutor, timeout, *serverAddr)
 	recorder := make(chan interface{}, 128)
 	bender.LoadTestThroughput(intervals, requests, exec, recorder)
 	l := log.New(os.Stdout, "", log.LstdFlags)

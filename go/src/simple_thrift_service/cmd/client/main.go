@@ -14,6 +14,8 @@ import (
 	"git.apache.org/thrift.git/lib/go/thrift"
 
 	"simple_thrift_service/thrift_gen/hello"
+
+	"simple_thrift_service/service"
 )
 
 func Connect(transportFactory thrift.TTransportFactory, addr string) (thrift.TTransport, error) {
@@ -54,10 +56,8 @@ func Send(protocolFactory thrift.TProtocolFactory, transport thrift.TTransport, 
 		log.Printf("%s - %v\n", inputMessage, err)
 		return err
 	}
-	log.Println(fmt.Sprintf("Message: [%s]", *response.Message))
-	for _, result := range response.Results {
-		log.Println(fmt.Sprintf("doc_id=%d\tscore=%f, %v", result.DocID, *result.Score, result.Vec))
-	}
+
+	service.PrintResp(response)
 	return nil
 }
 

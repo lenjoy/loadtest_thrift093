@@ -20,10 +20,12 @@ func (*HelloServiceHandler) SendMessage(request *hello.HelloRequest) (*hello.Hel
 }
 
 func (this *HelloServiceHandler) GetRelevance(request *hello.HelloRequest) (*hello.HelloResponse, error) {
+	log.Printf(" Begin GetRelevance: top[%d] %s\n", *request.TopK, *request.Message)
+
 	resp := hello.NewHelloResponse()
 	resp.Message = request.Message
 	resp.Results = this.docStore.GetRelatedDocs(*request.InputID, int(*request.TopK))
-	log.Printf("GetRelevance: %s\n", *request.Message)
+	log.Printf("  End  GetRelevance: top[%d] %s\n", *request.TopK, *request.Message)
 	return resp, nil
 }
 

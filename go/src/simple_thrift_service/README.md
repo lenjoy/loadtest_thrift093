@@ -44,6 +44,11 @@ loadtest_thrift093/go$ GOPATH=`pwd` go build -v -o ./bin/server simple_thrift_se
 loadtest_thrift093/go$ GOPATH=`pwd` go build -v -o ./bin/client simple_thrift_service/cmd/client
 ```
 
+## Run Unit test
+```
+loadtest_thrift093/go$ GOPATH=`pwd` go test -v simple_thrift_service/...
+```
+
 ## Run Server & Client
 ```
 loadtest_thrift093/go$ ./bin/server --port 9394
@@ -53,4 +58,11 @@ loadtest_thrift093/go$ ./bin/server --port 9394
 loadtest_thrift093/go$ ./bin/client --server_addr=localhost:9394 
 2018/09/15 21:49:11 Talking to server at [localhost:9394]
 2018/09/15 21:49:11 hello, world!
+```
+
+## Run Loadtest
+After the server has been running.
+```
+loadtest_thrift093/go$ GOPATH=`pwd` go build -v -o ./bin/loadtest simple_thrift_service/cmd/loadtest
+loadtest_thrift093/go$ ./bin/loadtest --num_request=200
 ```
