@@ -40,13 +40,12 @@ loadtest_thrift093/go/src/simple_thrift_service$ GOPATH=`pwd`/../.. dep ensure
 
 ## Compile
 ```
-loadtest_thrift093/go$ GOPATH=`pwd` go build -v -o ./bin/server simple_thrift_service/cmd/server
-loadtest_thrift093/go$ GOPATH=`pwd` go build -v -o ./bin/client simple_thrift_service/cmd/client
+loadtest_thrift093/go/src/simple_thrift_service$ make
 ```
 
 ## Run Unit test
 ```
-loadtest_thrift093/go$ GOPATH=`pwd` go test -v simple_thrift_service/...
+loadtest_thrift093/go/src/simple_thrift_service$ make test
 ```
 
 ## Run Server & Client
@@ -63,6 +62,5 @@ loadtest_thrift093/go$ ./bin/client --server_addr=localhost:9394
 ## Run Loadtest
 After the server has been running.
 ```
-loadtest_thrift093/go$ GOPATH=`pwd` go build -v -o ./bin/loadtest simple_thrift_service/cmd/loadtest
-loadtest_thrift093/go$ ./bin/loadtest --num_request=200
+loadtest_thrift093/go$ ./bin/loadtest --num_request=800 --qps=100
 ```

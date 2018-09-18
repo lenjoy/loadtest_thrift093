@@ -24,7 +24,7 @@ import (
 )
 
 func SyntheticRequests(query string, topK int16, n int) chan interface{} {
-	c := make(chan interface{}, 100)
+	c := make(chan interface{}, n)
 	go func() {
 		for i := 0; i < n; i++ {
 			request := hello.NewHelloRequest()
@@ -46,6 +46,10 @@ func HelloExecutor(request interface{}, transport thrift.TTransport) (interface{
 	client := hello.NewHelloServiceClientFactory(transport, pFac)
 	// return client.SendMessage(request.(*hello.HelloRequest))
 	response, err := client.GetRelevance(request.(*hello.HelloRequest))
+	if err != nil {
+		log.Printf("ERROR - %v", err)
+		return nil, err
+	}
 	service.PrintResp(response)
 	return response, err
 }
@@ -62,13 +66,14 @@ func main() {
 	query := flag.String("query", "hello, loadtest", "The input message")
 	numRequest := flag.Int64("num_request", 10, "The num of requests sending to server")
 	topK := flag.Int64("top_k", 3, "The num of results returning from server")
+	qps := flag.Float64("qps", 30.0, "The num of results returning from server")
 	flag.Parse()
 
-	intervals := bender.ExponentialIntervalGenerator(10.0)
+	intervals := bender.ExponentialIntervalGenerator(*qps)
 	requests := SyntheticRequests(*query, int16(*topK), int(*numRequest))
 	timeout := 20 * time.Second
 	exec := bthrift.NewThriftRequestExec(thrift.NewTFramedTransportFactory(thrift.NewTTransportFactory()), HelloExecutor, timeout, *serverAddr)
-	recorder := make(chan interface{}, 128)
+	recorder := make(chan interface{}, int(*numRequest))
 	bender.LoadTestThroughput(intervals, requests, exec, recorder)
 	l := log.New(os.Stdout, "", log.LstdFlags)
 	h := hist.NewHistogram(60000, 1000000)
