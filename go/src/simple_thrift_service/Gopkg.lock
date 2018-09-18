@@ -9,9 +9,25 @@
   revision = "53dd39833a08ce33582e5ff31fa18bb4735d6731"
   version = "0.9.3"
 
+[[projects]]
+  digest = "1:8c2d36d8cd85b40efbd412de47e5a2fb7d40f250c40d9ec961c6cc8807e0398f"
+  name = "github.com/lenjoy/bender"
+  packages = [
+    ".",
+    "hist",
+    "thrift",
+  ]
+  pruneopts = "UT"
+  revision = "3633e6f9319f82dc3b8a24a95c9f56b028298503"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  input-imports = ["git.apache.org/thrift.git/lib/go/thrift"]
+  input-imports = [
+    "git.apache.org/thrift.git/lib/go/thrift",
+    "github.com/lenjoy/bender",
+    "github.com/lenjoy/bender/hist",
+    "github.com/lenjoy/bender/thrift",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
