@@ -26,7 +26,9 @@ func NewDocStore(dim int16) *DocStore {
 // GetVector gets vector by given docID.
 func (this *DocStore) GetVector(docID int32) *doc.DocVec {
 	log.Printf("Begin GetVector doc_id[%d]", docID)
-	time.Sleep(time.Millisecond * 50)
+	// simulate the latency between [10, 20)
+	cnt := time.Duration(10 + randgen.GetInt(10))
+	time.Sleep(time.Millisecond * cnt)
 	return randgen.GenVec(int(this.Dim))
 }
 
