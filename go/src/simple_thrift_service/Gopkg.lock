@@ -20,6 +20,13 @@
   pruneopts = "UT"
   revision = "3633e6f9319f82dc3b8a24a95c9f56b028298503"
 
+[[projects]]
+  digest = "1:c4556a44e350b50a490544d9b06e9fba9c286c21d6c0e47f54f3a9214597298c"
+  name = "github.com/rcrowley/go-metrics"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "e2704e165165ec55d062f5919b4b29494e9fa790"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
@@ -28,6 +35,7 @@
     "github.com/lenjoy/bender",
     "github.com/lenjoy/bender/hist",
     "github.com/lenjoy/bender/thrift",
+    "github.com/rcrowley/go-metrics",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

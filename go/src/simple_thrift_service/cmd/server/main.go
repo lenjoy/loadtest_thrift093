@@ -10,8 +10,10 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"git.apache.org/thrift.git/lib/go/thrift"
+	"github.com/rcrowley/go-metrics"
 
 	"simple_thrift_service/thrift_gen/hello"
 
@@ -28,6 +30,12 @@ func RunServer(transportFactory thrift.TTransportFactory, protocolFactory thrift
 	processor := hello.NewHelloServiceProcessor(handler)
 	server := thrift.NewTSimpleServer4(processor, transport, transportFactory, protocolFactory)
 	return server.Serve()
+}
+
+func init() {
+	go metrics.Log(metrics.DefaultRegistry,
+		10*time.Second,
+		log.New(os.Stdout, "metrics: ", log.Lmicroseconds))
 }
 
 func Usage() {

@@ -29,11 +29,17 @@
   go-tests = true
   unused-packages = true
 
+# Thrift 0.9.3
 [[constraint]]
   name = "git.apache.org/thrift.git"
   version = "0.9.3"
 
-# For loadtest
+# Loadtest
 [[constraint]]
   name = "github.com/lenjoy/bender"
   revision = "3633e6f9319f82dc3b8a24a95c9f56b028298503"
+
+# Monitoring
+[[constraint]]
+  name = "github.com/rcrowley/go-metrics"
+  revision = "e2704e165165ec55d062f5919b4b29494e9fa790"

@@ -7,6 +7,9 @@ build:
 	cd $(GOPATH)
 	mkdir -p $(OUTPUT_DIR)
 
+	@GOPATH=$(GOPATH) $(GOCMD) build -v -o $(OUTPUT_DIR)/metrics simple_thrift_service/cmd/metrics/$(wildcard *.go)
+	@echo $(OUTPUT_DIR)/metrics
+
 	@GOPATH=$(GOPATH) $(GOCMD) build -v -o $(OUTPUT_DIR)/server simple_thrift_service/cmd/server/$(wildcard *.go)
 	@echo $(OUTPUT_DIR)/server
 
