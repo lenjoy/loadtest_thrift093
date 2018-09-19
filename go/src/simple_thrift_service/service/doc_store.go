@@ -1,7 +1,7 @@
 package service
 
 import (
-	"log"
+	//	"log"
 	"sort"
 	"sync"
 	"time"
@@ -25,7 +25,7 @@ func NewDocStore(dim int16) *DocStore {
 
 // GetVector gets vector by given docID.
 func (this *DocStore) GetVector(docID int32) *doc.DocVec {
-	log.Printf("Begin GetVector doc_id[%d]", docID)
+	// log.Printf("Begin GetVector doc_id[%d]", docID)
 	// simulate the latency between [10, 20)
 	cnt := time.Duration(10 + randgen.GetInt(10))
 	time.Sleep(time.Millisecond * cnt)
@@ -53,7 +53,7 @@ func (this *DocStore) GetRelatedDocs(docID int32, n int) []*hello.HelloDoc {
 			doc.Score = &score
 			docArrCh <- doc
 			wg.Done()
-			log.Printf("%d - doc_id[%d] done!", totalNum, relDocID)
+			//			log.Printf("%d - doc_id[%d] done!", totalNum, relDocID)
 		}()
 	}
 	wg.Wait()
